@@ -8,7 +8,7 @@ const Header = () => {
         <img src={logo} alt="logo" />
         <Link
           to="/"
-          className="px-4 py-3 rounded-lg bg-darkPink hover:opacity-75 ease-in-out duration-300 transition-all"
+          className="px-4 py-3 text-white rounded-lg bg-darkPink hover:opacity-75 ease-in-out duration-300 transition-all"
         >
           მთავარი
         </Link>
