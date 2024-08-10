@@ -3,32 +3,33 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Input from "../components/Input";
 import { FormData } from "../types";
+import { useState } from "react";
 
 const FormFill = () => {
-  // const [formStep, setFormStep] = useState<number>(0);
+  const [formStep, setFormStep] = useState<number>(0);
   const steps = ["სახელი", "პაროლი", "ელ-ფოსტა", "დასასრული"];
-  const addCategorySchema = yup.object({
+  const userDataSchema = yup.object({
     username: yup
       .string()
       .required("მიუთითეთ სახელი")
       .min(4, "მინიმუმ 4 ასო")
       .max(50, "მაქსიმუმ 50 ასო"),
-    email: yup.string().required("მიუთითეთ ელ-ფოსტა").email("არასწორი ფორმატი"),
     password: yup
       .string()
       .required("მიუთითეთ პაროლი")
       .min(8, "მინიმუმ 8 სიმბოლო")
       .max(20, "მაქსიმუმ 8 სიმბოლო")
-      .matches(/(?=.*[A-Z])/, "უნდა შეიცავდეს მინიმუმ ერთ დიდ ასოს")
+      .matches(/(?=.*[A-Z])/, "უნდა შეიცავდეს მინიმუმ 1 დიდ ასოს")
       .matches(/(?=.*\d)/, "უნდა შეიცავდეს მინიმუმ 1 ციფრს"),
+    email: yup.string().required("მიუთითეთ ელ-ფოსტა").email("არასწორი ფორმატი"),
   });
 
   const methods = useForm({
-    resolver: yupResolver(addCategorySchema),
+    resolver: yupResolver(userDataSchema),
     defaultValues: {
       username: "",
-      email: "",
       password: "",
+      email: "",
     },
     mode: "all",
   });
@@ -57,9 +58,9 @@ const FormFill = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Input
             name="username"
-            placeholder="username"
+            placeholder="სახელი"
             type="text"
-            label="Username"
+            label="სახელი"
             error={errors.username?.message}
           />
         </form>
