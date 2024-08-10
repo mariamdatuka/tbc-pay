@@ -26,7 +26,7 @@ const Input: React.FC<InputProps> = ({
           id={id}
           value={value}
         />
-        <p className="text-sm text-red absolute -bottom-[26px] ">{error}</p>
+        <p className="text-xs text-red absolute -bottom-[26px] ">{error}</p>
       </div>
     </>
   );
