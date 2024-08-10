@@ -5,11 +5,22 @@ import Input from "../components/Input";
 import { FormData } from "../types";
 
 const FormFill = () => {
+  // const [formStep, setFormStep] = useState<number>(0);
   const steps = ["სახელი", "პაროლი", "ელ-ფოსტა", "დასასრული"];
   const addCategorySchema = yup.object({
-    username: yup.string().required("მიუთითეთ სახელი"),
-    email: yup.string().required("მიუთითეთ ელ-ფოსტა"),
-    password: yup.string().required("პაროლი არასწორია"),
+    username: yup
+      .string()
+      .required("მიუთითეთ სახელი")
+      .min(4, "მინიმუმ 4 ასო")
+      .max(50, "მაქსიმუმ 50 ასო"),
+    email: yup.string().required("მიუთითეთ ელ-ფოსტა").email("არასწორი ფორმატი"),
+    password: yup
+      .string()
+      .required("მიუთითეთ პაროლი")
+      .min(8, "მინიმუმ 8 სიმბოლო")
+      .max(20, "მაქსიმუმ 8 სიმბოლო")
+      .matches(/(?=.*[A-Z])/, "უნდა შეიცავდეს მინიმუმ ერთ დიდ ასოს")
+      .matches(/(?=.*\d)/, "უნდა შეიცავდეს მინიმუმ 1 ციფრს"),
   });
 
   const methods = useForm({
