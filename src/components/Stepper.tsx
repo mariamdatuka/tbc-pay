@@ -7,11 +7,11 @@ const Stepper = () => {
   }));
   return (
     <>
-      <div className="flex gap-20">
+      <div className="flex flex-wrap gap-12 md:gap-20">
         {steps?.map((item, i) => (
-          <div key={i} className={`step-item `}>
+          <div key={i} className="flex flex-col items-center">
             <div
-              className={`step ${
+              className={`w-10 h-10 rounded-full flex items-center justify-center border border-lightGrey ${
                 completedSteps.includes(i)
                   ? "bg-green"
                   : currentStep === i && i === steps.length - 1

@@ -111,8 +111,10 @@ const FormFill = () => {
               <button
                 onClick={prevInput}
                 disabled={currentStep === 0}
-                className={`px-4 py-3 cursor-pointer text-darkBlue rounded-lg border border-lightGrey hover:opacity-75 ease-in-out duration-300 transition-all ${
-                  currentStep === 0 ? "opacity-50 cursor-not-allowed" : ""
+                className={`px-4 py-3 text-darkBlue rounded-lg border border-lightGrey hover:opacity-75 ease-in-out duration-300 transition-all ${
+                  currentStep === 0
+                    ? "opacity-50 cursor-not-allowed"
+                    : "cursor-pointer"
                 }`}
               >
                 უკან
