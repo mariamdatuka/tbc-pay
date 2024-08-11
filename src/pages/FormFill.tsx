@@ -1,9 +1,12 @@
 import { FormProvider, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { UserDataSchema } from "../lib/Schema";
 import Input from "../components/Input";
 import { FormData } from "../types";
-import { useState } from "react";
+import useStepsStore from "../store/currentStepsStore";
+
+type Inputs = z.infer<typeof UserDataSchema>;
 
 const steps = [
   {
@@ -24,29 +27,14 @@ const steps = [
 ];
 
 const FormFill = () => {
-  const [previousStep, setPreviousStep] = useState<number>(0);
-  const [currentStep, setCurrentStep] = useState<number>(0);
+  const { currentStep, nextStep, prevStep } = useStepsStore((state) => ({
+    currentStep: state.currentStep,
+    nextStep: state.nextStep,
+    prevStep: state.prevStep,
+  }));
 
-  console.log(previousStep);
-  const userDataSchema = yup.object({
-    username: yup
-      .string()
-      .required("მიუთითეთ სახელი")
-      .min(4, "მინიმუმ 4 ასო")
-      .max(50, "მაქსიმუმ 50 ასო"),
-    password: yup
-      .string()
-      .required("მიუთითეთ პაროლი")
-      .matches(/^[a-zA-Z0-9]+$/, "მხოლოდ ლათინური ასოები და ციფრები")
-      .min(8, "მინიმუმ 8 სიმბოლო")
-      .max(20, "მაქსიმუმ 20 სიმბოლო")
-      .matches(/(?=.*[A-Z])/, "მინიმუმ 1 დიდი ასო")
-      .matches(/(?=.*\d)/, "მინიმუმ 1 ციფრი"),
-    email: yup.string().required("მიუთითეთ ელ-ფოსტა").email("არასწორი ფორმატი"),
-  });
-
-  const methods = useForm({
-    resolver: yupResolver(userDataSchema),
+  const methods = useForm<Inputs>({
+    resolver: zodResolver(UserDataSchema),
     defaultValues: {
       username: "",
       password: "",
@@ -75,19 +63,19 @@ const FormFill = () => {
       if (currentStep === steps.length - 2) {
         await handleSubmit(onSubmit)();
       }
-      setPreviousStep(currentStep);
-      setCurrentStep((step) => step + 1);
+      nextStep();
     }
   };
+
+  const prevInput = () => {
+    if (currentStep > 0) {
+      prevStep();
+    }
+  };
+
   const onSubmit = (data: FormData) => {
     reset();
     console.log(data);
-  };
-  const prev = () => {
-    if (currentStep > 0) {
-      setPreviousStep(currentStep);
-      setCurrentStep((step) => step - 1);
-    }
   };
 
   return (
@@ -130,8 +118,9 @@ const FormFill = () => {
                 error={errors.email?.message}
               />
             )}
+            {currentStep === 3 && <h1>Thank u</h1>}
             <div className="flex items-center justify-between mt-12">
-              <button onClick={prev} disabled={currentStep === 0}>
+              <button onClick={prevInput} disabled={currentStep === 0}>
                 back
               </button>
               <button
