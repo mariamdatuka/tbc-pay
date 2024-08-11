@@ -5,13 +5,29 @@ import Input from "../components/Input";
 import { FormData } from "../types";
 import { useState } from "react";
 
-const FormFill = () => {
-  const [formStep, setFormStep] = useState<number>(1);
-  const steps = ["სახელი", "პაროლი", "ელ-ფოსტა", "დასასრული"];
+const steps = [
+  {
+    name: "სახელი",
+    field: "username",
+  },
+  {
+    name: "პაროლი",
+    field: "password",
+  },
+  {
+    name: "ელ-ფოსტა",
+    field: "email",
+  },
+  {
+    name: "დასასრული",
+  },
+];
 
-  const handlePrevInput = () => {
-    setFormStep((prev) => prev - 1);
-  };
+const FormFill = () => {
+  const [previousStep, setPreviousStep] = useState<number>(0);
+  const [currentStep, setCurrentStep] = useState<number>(0);
+
+  console.log(previousStep);
   const userDataSchema = yup.object({
     username: yup
       .string()
@@ -39,71 +55,38 @@ const FormFill = () => {
     mode: "all",
   });
   const {
-    formState: { errors, isDirty },
+    formState: { errors },
     handleSubmit,
+    reset,
+    trigger,
   } = methods;
 
-  console.log(errors);
-  const handleNextInput = () => {
-    setFormStep((prev) => prev + 1);
+  const nextInput = async () => {
+    const inputField = steps[currentStep].field as
+      | "username"
+      | "password"
+      | "email";
+
+    const isValid = await trigger(inputField);
+
+    if (!isValid) return;
+
+    if (currentStep < steps.length - 1) {
+      if (currentStep === steps.length - 2) {
+        await handleSubmit(onSubmit)();
+      }
+      setPreviousStep(currentStep);
+      setCurrentStep((step) => step + 1);
+    }
   };
   const onSubmit = (data: FormData) => {
-    setFormStep((prev) => prev + 1);
+    reset();
     console.log(data);
   };
-
-  const renderButtons = () => {
-    if (formStep > 3) {
-      return undefined;
-    } else if (formStep === 2) {
-      return (
-        <>
-          <button
-            className="rounded-lg border border-lightGrey text-grey bg- px-4 py-3 text-sm"
-            type="button"
-            onClick={handlePrevInput}
-          >
-            უკან
-          </button>
-          <button
-            disabled={!errors}
-            onClick={handleNextInput}
-            type="button"
-            className="bg-mainBlue text-white text-sm rounded-lg px-4 py-3 hover:opacity-75 ease-in-out duration-300 transition-all"
-          >
-            შემდეგი
-          </button>
-        </>
-      );
-    } else if (formStep === 3) {
-      return (
-        <>
-          <button
-            className="rounded-lg border border-lightGrey text-grey bg- px-4 py-3 text-sm"
-            type="button"
-            onClick={handlePrevInput}
-          >
-            უკან
-          </button>
-          <button
-            type="submit"
-            className="bg-mainBlue text-white text-sm rounded-lg px-4 py-3 hover:opacity-75 ease-in-out duration-300 transition-all"
-          >
-            დასრულება
-          </button>
-        </>
-      );
-    } else {
-      return (
-        <button
-          disabled={Object.keys(errors).length > 0 || !isDirty}
-          onClick={handleNextInput}
-          type="button"
-          className="bg-mainBlue text-white text-sm rounded-lg px-4 py-3 hover:opacity-75 ease-in-out duration-300 transition-all"
-        >
-          შემდეგი
-        </button>
-      );
+  const prev = () => {
+    if (currentStep > 0) {
+      setPreviousStep(currentStep);
+      setCurrentStep((step) => step - 1);
     }
   };
 
@@ -114,13 +97,13 @@ const FormFill = () => {
           {steps?.map((item, i) => (
             <div key={i} className={`step-item`}>
               <div className="step">{i + 1}</div>
-              <p>{item}</p>
+              <p>{item.name}</p>
             </div>
           ))}
         </div>
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
-            {formStep === 1 && (
+            {currentStep === 0 && (
               <Input
                 name="username"
                 placeholder="სახელი"
@@ -129,7 +112,7 @@ const FormFill = () => {
                 error={errors.username?.message}
               />
             )}
-            {formStep === 2 && (
+            {currentStep === 1 && (
               <Input
                 name="password"
                 placeholder="პაროლი"
@@ -138,7 +121,7 @@ const FormFill = () => {
                 error={errors.password?.message}
               />
             )}
-            {formStep === 3 && (
+            {currentStep === 2 && (
               <Input
                 name="email"
                 placeholder="ელ-ფოსტა"
@@ -148,7 +131,15 @@ const FormFill = () => {
               />
             )}
             <div className="flex items-center justify-between mt-12">
-              {renderButtons()}
+              <button onClick={prev} disabled={currentStep === 0}>
+                back
+              </button>
+              <button
+                onClick={nextInput}
+                disabled={currentStep === steps.length - 1}
+              >
+                next
+              </button>
             </div>
           </form>
         </FormProvider>
