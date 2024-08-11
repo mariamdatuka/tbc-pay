@@ -11,6 +11,7 @@ export default {
       lightGrey: "#CDCDCD",
       light: "#F1F5F5",
       red: "#EF0107",
+      green: "#32de84",
     },
 
     extend: {},

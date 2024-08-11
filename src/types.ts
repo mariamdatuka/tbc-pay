@@ -7,9 +7,3 @@ export interface InputProps {
   id?: string;
   value?: string;
 }
-
-export interface FormData {
-  username: string;
-  email: string;
-  password: string;
-}

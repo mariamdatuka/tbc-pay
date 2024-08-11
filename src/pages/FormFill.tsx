@@ -1,37 +1,22 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserDataSchema } from "../lib/Schema";
+import { UserDataSchema } from "../lib/schema";
 import Input from "../components/Input";
-import { FormData } from "../types";
 import useStepsStore from "../store/currentStepsStore";
-
+import { steps } from "../steps";
+import Stepper from "../components/Stepper";
 type Inputs = z.infer<typeof UserDataSchema>;
 
-const steps = [
-  {
-    name: "სახელი",
-    field: "username",
-  },
-  {
-    name: "პაროლი",
-    field: "password",
-  },
-  {
-    name: "ელ-ფოსტა",
-    field: "email",
-  },
-  {
-    name: "დასასრული",
-  },
-];
-
 const FormFill = () => {
-  const { currentStep, nextStep, prevStep } = useStepsStore((state) => ({
-    currentStep: state.currentStep,
-    nextStep: state.nextStep,
-    prevStep: state.prevStep,
-  }));
+  const { currentStep, nextStep, prevStep, markStepComplete } = useStepsStore(
+    (state) => ({
+      currentStep: state.currentStep,
+      nextStep: state.nextStep,
+      prevStep: state.prevStep,
+      markStepComplete: state.markStepComplete,
+    })
+  );
 
   const methods = useForm<Inputs>({
     resolver: zodResolver(UserDataSchema),
@@ -42,6 +27,7 @@ const FormFill = () => {
     },
     mode: "all",
   });
+
   const {
     formState: { errors },
     handleSubmit,
@@ -63,6 +49,7 @@ const FormFill = () => {
       if (currentStep === steps.length - 2) {
         await handleSubmit(onSubmit)();
       }
+      markStepComplete(currentStep);
       nextStep();
     }
   };
@@ -73,7 +60,7 @@ const FormFill = () => {
     }
   };
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = (data: Inputs) => {
     reset();
     console.log(data);
   };
@@ -81,14 +68,7 @@ const FormFill = () => {
   return (
     <>
       <section className="flex flex-col items-center gap-8">
-        <div className="flex gap-20">
-          {steps?.map((item, i) => (
-            <div key={i} className={`step-item`}>
-              <div className="step">{i + 1}</div>
-              <p>{item.name}</p>
-            </div>
-          ))}
-        </div>
+        <Stepper />
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
             {currentStep === 0 && (
@@ -118,16 +98,30 @@ const FormFill = () => {
                 error={errors.email?.message}
               />
             )}
-            {currentStep === 3 && <h1>Thank u</h1>}
-            <div className="flex items-center justify-between mt-12">
-              <button onClick={prevInput} disabled={currentStep === 0}>
-                back
+            {currentStep === 3 && (
+              <h1 className="text-darkBlue font-semibold text-xl">
+                წარმატებით შესრულდა!
+              </h1>
+            )}
+            <div
+              className={`${
+                currentStep === 3 ? "hidden" : "flex"
+              } items-center justify-between mt-12`}
+            >
+              <button
+                onClick={prevInput}
+                disabled={currentStep === 0}
+                className={`px-4 py-3 cursor-pointer text-darkBlue rounded-lg border border-lightGrey hover:opacity-75 ease-in-out duration-300 transition-all ${
+                  currentStep === 0 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                უკან
               </button>
               <button
+                className="px-4 py-3 text-white rounded-lg bg-mainBlue cursor-pointer hover:opacity-75 ease-in-out duration-300 transition-all"
                 onClick={nextInput}
-                disabled={currentStep === steps.length - 1}
               >
-                next
+                შემდეგი
               </button>
             </div>
           </form>
