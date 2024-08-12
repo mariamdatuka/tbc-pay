@@ -109,6 +109,7 @@ const FormFill = () => {
               } items-center justify-between mt-12`}
             >
               <button
+                type="button"
                 onClick={prevInput}
                 disabled={currentStep === 0}
                 className={`px-4 py-3 text-darkBlue rounded-lg border border-lightGrey hover:opacity-75 ease-in-out duration-300 transition-all ${
@@ -122,6 +123,7 @@ const FormFill = () => {
               <button
                 className="px-4 py-3 text-white rounded-lg bg-mainBlue cursor-pointer hover:opacity-75 ease-in-out duration-300 transition-all"
                 onClick={nextInput}
+                type="button"
               >
                 შემდეგი
               </button>
